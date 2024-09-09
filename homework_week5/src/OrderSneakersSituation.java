@@ -13,6 +13,10 @@ public class OrderSneakersSituation {
         int daysForDeliver = 3;
         int costForDeliver = 15_000;
 
+        Shoes shoes = new Shoes(nikeSneakersPrice,nikeSneakersFeature);
+        Customer customer = new Customer(isCustomerLikeDelivery);
+        Staff staff = new Staff(shoes,havingNikeSneakersInStore);
+        DeliveryManager deliveryManager = new DeliveryManager(daysForDeliver,costForDeliver);
         /**
          *  필수 인스턴스 생성
          *  Customer, staff, DeliveryManager를 생성하고 시작합니다.
@@ -30,5 +34,51 @@ public class OrderSneakersSituation {
          * */
 
         // TODO: 클래스를 선언하고, 객체간의 협력으로 구현해주세요.
+        customer.askAboutShoes(staff);
+        if(!customer.paymentPossible(staff))
+            return; //잔고 부족시 상황종료
+        if(staff.isHavingShoes()){
+            //재고가 있을경우
+            staff.processShoePayment(customer);
+            staff.sendShoes();
+            customer.wearShoes(staff);
+           return;
+        }
+            // 재고가 없을경우
+        if(!customer.isDeliveryPreferred()) { //  배송선호 안할시 상황종료
+                customer.endWithSeeYouNextTime();
+                return;
+            }
+        staff.processShoePayment(customer);
+        if(staff.requestDelivery(deliveryManager)> customer.getCash()+ shoes.getPrice())
+        /**
+         * 이미 결제는 진행됐으니 신발값 더해줘야됨 주의
+         */
+
+        {
+            staff.refundShoePayment(customer);
+            customer.endWithSeeYouNextTime();
+            return;
+
+        }
+        deliveryManager.setDeliveryPackage(new DeliveryPackage(shoes)); //포장
+        customer.payDeliveryFee(deliveryManager); // 계산
+        customer.wearShoesFromPackage(deliveryManager); //신기
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
 }
